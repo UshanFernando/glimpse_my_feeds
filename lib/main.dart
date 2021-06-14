@@ -1,33 +1,44 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
+import 'package:glimpse_my_feeds/screens/ViewFeed.dart';
+import 'package:glimpse_my_feeds/service/Feeds.dart';
+import 'package:http/io_client.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:webfeed/webfeed.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider<ThemeNotifier>(
+      create: (_) => new ThemeNotifier(), child: new MyApp()));
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Glimpse My Feeds',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        // This makes the visual density adapt to the platform that you run
-        // the app on. For desktop platforms, the controls will be smaller and
-        // closer together (more dense) than on mobile platforms.
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return Consumer<ThemeNotifier>(
+        builder: (context, theme, _) => MaterialApp(
+            title: 'Glimpse My Feeds',
+            theme: ThemeData(
+              // This is the theme of your application.
+              //
+              // Try running your application with "flutter run". You'll see the
+              // application has a blue toolbar. Then, without quitting the app, try
+              // changing the primarySwatch below to Colors.green and then invoke
+              // "hot reload" (press "r" in the console where you ran "flutter run",
+              // or simply save your changes to "hot reload" in a Flutter IDE).
+              // Notice that the counter didn't reset back to zero; the application
+              // is not restarted.
+              primarySwatch: Colors.blue,
+              // This makes the visual density adapt to the platform that you run
+              // the app on. For desktop platforms, the controls will be smaller and
+              // closer together (more dense) than on mobile platforms.
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            home: ViewFeed()
+            // MyHomePage(title: 'Flutter Demo Home Page'),
+            ));
   }
 }
 
