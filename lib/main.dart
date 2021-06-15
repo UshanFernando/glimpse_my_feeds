@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/ViewFeed.dart';
+import 'package:glimpse_my_feeds/screens/AddFeed.dart';
+import 'package:glimpse_my_feeds/screens/LoginPage.dart';
 import 'package:glimpse_my_feeds/service/Feeds.dart';
 import 'package:http/io_client.dart';
 import 'package:flutter/material.dart';
@@ -36,7 +38,7 @@ class MyApp extends StatelessWidget {
               // closer together (more dense) than on mobile platforms.
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: ViewFeed()
+            home: AddFeed()
             // MyHomePage(title: 'Flutter Demo Home Page'),
             ));
   }
