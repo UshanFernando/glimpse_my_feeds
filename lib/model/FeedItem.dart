@@ -10,8 +10,10 @@ class FeedItem {
     return {'title': title, 'url': url, 'imgUrl': imgUrl};
   }
 
-  FeedItem.fromFirestore(Map<String, dynamic> firestore)
-      : title = firestore['title'] ?? 'N/A',
-        url = firestore['url'] ?? 'N/A',
-        imgUrl = firestore['imgUrl'] ?? 'N/A';
+  FeedItem.fromFirestore(Map<String, dynamic> firestore) {
+    print(firestore);
+    title = firestore['title'] ?? 'N/A';
+    url = firestore['url'] ?? 'N/A';
+    imgUrl = firestore['imgUrl'] ?? 'N/A';
+  }
 }

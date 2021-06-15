@@ -20,10 +20,9 @@ class DBService {
         .doc('ushn@gmail.com')
         .collection('feeds')
         .snapshots()
-        .map((snapshot) => snapshot.docs.map((document) {
-              FeedItem.fromFirestore(document.data());
-              print('feed : ${document.data()}');
-            }).toList());
+        .map((snapshot) => snapshot.docs
+            .map((document) => FeedItem.fromFirestore(document.data()))
+            .toList());
   }
 
   // Stream<List<SupplierQuotation>> getSupplierQuatations() {

@@ -16,10 +16,18 @@ class Home extends StatelessWidget {
     // items.map((event) => print(event.toString()));
     // dbservice.saveFeed(new FeedItem(
     //     title: "Neth NEWS", url: 'HRR[AFKSALA', imgUrl: 'DFSFSDFSFDS'));
-
-    // return Scaffold(
-    //   appBar: AppBar(),
-    //   body: Column(children: [databaseReference.map((e) =>  Text(e.title))],)
-    // );
+    print(feeds);
+    return Scaffold(
+        appBar: AppBar(),
+        body: GridView.builder(
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2),
+          itemBuilder: (_, index) => Card(
+            child: Stack(
+              children: [Text(feeds[index].title)],
+            ),
+          ),
+          itemCount: feeds.length,
+        ));
   }
 }
