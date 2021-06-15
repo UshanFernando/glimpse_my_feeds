@@ -17,14 +17,14 @@ class ThemeNotifier with ChangeNotifier {
     primaryColor: Colors.white,
     brightness: Brightness.light,
     backgroundColor: Colors.white,
-    accentColor: Colors.black,
+    accentColor: Colors.indigoAccent,
     accentIconTheme: IconThemeData(color: Colors.white),
     dividerColor: Colors.white54,
   );
   bool _darkMod;
 
   ThemeData _themeData;
-  ThemeData get getTheme => _themeData;
+  ThemeData get getTheme => _themeData == null ? lightTheme : _themeData;
 
   ThemeNotifier() {
     StorageManager.readData('themeMode').then((value) {
