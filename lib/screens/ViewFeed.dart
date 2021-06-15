@@ -46,12 +46,7 @@ class ViewFeed extends StatelessWidget {
                       onPressed: () {
                         DBService()
                             .deleteFeed(feedItem.id)
-                            .then((value) => Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => Home(),
-                                  ),
-                                ));
+                            .then((value) => Navigator.pop(context));
                       },
                     ),
                   ],
@@ -59,12 +54,7 @@ class ViewFeed extends StatelessWidget {
                     icon: new Icon(Icons.arrow_back),
                     tooltip: 'Go Back',
                     onPressed: () => {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Home(),
-                        ),
-                      )
+                      Navigator.pop(context)
                     },
                   ),
                   // title: Text("Coporate News"),
