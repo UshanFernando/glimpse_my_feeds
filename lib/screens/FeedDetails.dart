@@ -8,6 +8,8 @@ class FeedDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var feedItem = ModalRoute.of(context).settings.arguments as RssItem;
+    double width = MediaQuery.of(context).size.width;
+    double height = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         title: Text("View Feeds"),

@@ -1,4 +1,5 @@
 class FeedItem {
+  String id;
   String title;
   String url;
   String imgUrl;
@@ -10,8 +11,8 @@ class FeedItem {
     return {'title': title, 'url': url, 'imgUrl': imgUrl};
   }
 
-  FeedItem.fromFirestore(Map<String, dynamic> firestore) {
-    print(firestore);
+  FeedItem.fromFirestore(Map<String, dynamic> firestore, String id) {
+    this.id = id;
     title = firestore['title'] ?? 'N/A';
     url = firestore['url'] ?? 'N/A';
     imgUrl = firestore['imgUrl'] ?? 'N/A';

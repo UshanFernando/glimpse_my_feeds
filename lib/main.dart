@@ -34,6 +34,8 @@ class MyApp extends StatelessWidget {
             create: (context) => dbService.getFeeds(),
             initialData: initData,
           ),
+          ChangeNotifierProvider<ThemeNotifier>(
+              create: (_) => new ThemeNotifier())
         ],
         child: MaterialApp(
             title: 'Glimpse My Feeds',

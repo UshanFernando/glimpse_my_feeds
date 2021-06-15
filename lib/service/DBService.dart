@@ -21,8 +21,18 @@ class DBService {
         .collection('feeds')
         .snapshots()
         .map((snapshot) => snapshot.docs
-            .map((document) => FeedItem.fromFirestore(document.data()))
+            .map((document) =>
+                FeedItem.fromFirestore(document.data(), document.id))
             .toList());
+  }
+
+  Future<void> deleteFeed(String feedId) {
+    return _db
+        .collection('users')
+        .doc('ushn@gmail.com')
+        .collection('feeds')
+        .doc(feedId)
+        .delete();
   }
 
   // Stream<List<SupplierQuotation>> getSupplierQuatations() {

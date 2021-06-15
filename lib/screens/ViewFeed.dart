@@ -3,6 +3,8 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/FeedDetails.dart';
+import 'package:glimpse_my_feeds/screens/Home.dart';
+import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:glimpse_my_feeds/service/Feeds.dart';
 import 'package:http/io_client.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,7 @@ class ViewFeed extends StatelessWidget {
   // rssRetrieve();
   @override
   Widget build(BuildContext context) {
-    // var feeds = Provider.of<List<FeedItem>>(context);
+    var feedItem = ModalRoute.of(context).settings.arguments as FeedItem;
     // print(feeds);
     // print(feed);
     double width = MediaQuery.of(context).size.width;
@@ -31,28 +33,49 @@ class ViewFeed extends StatelessWidget {
                   backgroundColor: theme.getTheme.accentColor,
                   floating: false,
                   pinned: true,
-                  title: Text("BBC News"),
+                  // title: Text("BBC News"),
                   actions: <Widget>[
+                    IconButton(
+                      icon: new Icon(Icons.edit),
+                      tooltip: 'Edit',
+                      onPressed: () => {},
+                    ),
                     new IconButton(
                       icon: new Icon(Icons.delete),
-                      tooltip: 'Air it',
-                      onPressed: () {},
+                      tooltip: 'Delete',
+                      onPressed: () {
+                        DBService()
+                            .deleteFeed(feedItem.id)
+                            .then((value) => Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => Home(),
+                                  ),
+                                ));
+                      },
                     ),
                   ],
                   leading: IconButton(
-                    icon: new Icon(Icons.edit),
-                    tooltip: 'Air it',
-                    onPressed: () => {},
+                    icon: new Icon(Icons.arrow_back),
+                    tooltip: 'Go Back',
+                    onPressed: () => {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Home(),
+                        ),
+                      )
+                    },
                   ),
                   // title: Text("Coporate News"),
                   elevation: 8,
                   flexibleSpace: FlexibleSpaceBar(
                     centerTitle: true,
-                    title: Text("Neth News"),
+                    title: Text(feedItem.title),
                     background: Container(
                       height: 400,
                       child: Image.network(
-                        "https://logodix.com/logo/614731.png",
+                        feedItem.imgUrl,
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -60,7 +83,7 @@ class ViewFeed extends StatelessWidget {
             ];
           },
           body: FutureBuilder<RssFeed>(
-            future: Feeds().getFeed(),
+            future: Feeds().getFeed(feedItem.url),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return ListView.builder(
@@ -130,7 +153,33 @@ class ViewFeed extends StatelessWidget {
                       );
                     });
               } else {
-                return Text('awaiting the future');
+                return Center(
+                    child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Loading Data...',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: theme.getTheme.textTheme.bodyText1.color),
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    CircularProgressIndicator(),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Text(
+                      'If This Take Longer than 1 minute,\n Please Check Your Feed URL!',
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: theme.getTheme.textTheme.bodyText1.color),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ));
               }
             },
           ),
