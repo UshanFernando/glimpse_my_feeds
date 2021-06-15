@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "346413682002",
+    "firebase_url": "https://glimpse-fae16-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "glimpse-fae16",
+    "storage_bucket": "glimpse-fae16.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:346413682002:android:46f0bf84f00bc19762fe8b",
+        "android_client_info": {
+          "package_name": "com.hackslash.glimpse"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "346413682002-3jh7005uo3o9bunubgm59abgb2f6drnn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAM7IBlFi3qyf31cIbUDB7QF5o3eV7GEWw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "346413682002-3jh7005uo3o9bunubgm59abgb2f6drnn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

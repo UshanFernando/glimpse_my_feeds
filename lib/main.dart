@@ -1,26 +1,45 @@
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
+import 'package:glimpse_my_feeds/screens/Home.dart';
 import 'package:glimpse_my_feeds/screens/ViewFeed.dart';
 import 'package:glimpse_my_feeds/screens/AddFeed.dart';
 import 'package:glimpse_my_feeds/screens/LoginPage.dart';
 import 'package:glimpse_my_feeds/service/Feeds.dart';
+import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:http/io_client.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
-void main() {
-  runApp(ChangeNotifierProvider<ThemeNotifier>(
-      create: (_) => new ThemeNotifier(), child: new MyApp()));
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(new MyApp());
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  DBService dbService = DBService();
+  List<FeedItem> initData = [
+    new FeedItem(title: 'Neth', url: 'salndsoalnd'),
+    new FeedItem(title: 'Hiru', url: 'salndsoalnd'),
+  ];
   @override
   Widget build(BuildContext context) {
-    return Consumer<ThemeNotifier>(
-        builder: (context, theme, _) => MaterialApp(
+    return MultiProvider(
+        providers: [
+          // ChangeNotifierProvider(create: (context) => RequisitionProvider()),
+          StreamProvider(
+            create: (context) => dbService.getFeeds(),
+            initialData: initData,
+          ),
+          ChangeNotifierProvider<ThemeNotifier>(
+              create: (_) => new ThemeNotifier())
+        ],
+        child: MaterialApp(
             title: 'Glimpse My Feeds',
             theme: ThemeData(
               // This is the theme of your application.
