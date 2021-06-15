@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/model/User.dart';
 
 class DBService {
   final _db = FirebaseFirestore.instance;
@@ -11,6 +12,19 @@ class DBService {
         .collection('feeds')
         .doc()
         .set(feed.toMap());
+  }
+
+  Future<void> register(User user) {
+    print(user.email);
+    return _db.collection('users').doc(user.email).set(user.toMap());
+  }
+
+  Stream<User> loginUser(User user) {
+    return _db
+        .collection('users')
+        .doc(user.email)
+        .snapshots()
+        .map((document) => User.fromFirestore(document.data(), document.id));
   }
 
   Stream<List<FeedItem>> getFeeds() {

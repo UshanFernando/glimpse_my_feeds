@@ -2,11 +2,13 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/Home.dart';
 import 'package:glimpse_my_feeds/screens/ViewFeed.dart';
 import 'package:glimpse_my_feeds/screens/AddFeed.dart';
 import 'package:glimpse_my_feeds/screens/LoginPage.dart';
+import 'package:glimpse_my_feeds/screens/SignUp.dart';
 import 'package:glimpse_my_feeds/service/Feeds.dart';
 import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:http/io_client.dart';
@@ -32,6 +34,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           // ChangeNotifierProvider(create: (context) => RequisitionProvider()),
+          ChangeNotifierProvider<RegistrationProvider>(
+              create: (_) => new RegistrationProvider()),
           StreamProvider(
             create: (context) => dbService.getFeeds(),
             initialData: initData,
@@ -57,7 +61,7 @@ class MyApp extends StatelessWidget {
               // closer together (more dense) than on mobile platforms.
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: AddFeed()
+            home: LoginPage()
             // MyHomePage(title: 'Flutter Demo Home Page'),
             ));
   }
