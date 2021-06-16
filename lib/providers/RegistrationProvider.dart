@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/model/User.dart';
 import 'package:glimpse_my_feeds/service/DBService.dart';
+import 'package:glimpse_my_feeds/service/StorageController.dart';
 import 'package:intl/intl.dart';
 
 class RegistrationProvider with ChangeNotifier {
@@ -55,6 +56,7 @@ class RegistrationProvider with ChangeNotifier {
     if (user != null) {
       changeIsLogged(true);
       print("true");
+      StorageManager.saveData('user', user.email);
       return true;
       // print()
     } else {

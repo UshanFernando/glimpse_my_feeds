@@ -5,10 +5,10 @@ import 'package:glimpse_my_feeds/model/User.dart';
 class DBService {
   final _db = FirebaseFirestore.instance;
 
-  Future<void> saveFeed(FeedItem feed) {
+  Future<void> saveFeed(FeedItem feed, email) {
     return _db
         .collection('users')
-        .doc('ushn@gmail.com')
+        .doc(email)
         .collection('feeds')
         .doc()
         .set(feed.toMap());
