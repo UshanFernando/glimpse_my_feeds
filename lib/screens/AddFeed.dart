@@ -1,8 +1,11 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/providers/FeedProvider.dart';
+import 'package:glimpse_my_feeds/screens/Home.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:path/path.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AddFeed extends StatefulWidget {
   @override
@@ -10,31 +13,6 @@ class AddFeed extends StatefulWidget {
 }
 
 class _AddFeedState extends State<AddFeed> {
-  File _image;
-  final picker = ImagePicker();
-  Future chooseFile() async {
-    File image = await ImagePicker.pickImage(
-        source: ImageSource.gallery, imageQuality: 50);
-
-    setState(() {
-      _image = image;
-    });
-  }
-
-//  Future uploadFile() async {
-//    StorageReference storageReference = FirebaseStorage.instance
-//        .ref()
-//        .child('chats/${Path.basename(_image.path)}}');
-//    StorageUploadTask uploadTask = storageReference.putFile(_image);
-//    await uploadTask.onComplete;
-//    print('File Uploaded');
-//    storageReference.getDownloadURL().then((fileURL) {
-//      setState(() {
-//        _uploadedFileURL = fileURL;
-//      });
-//    });
-//  }
-
   Widget _entryField(String title,
       {bool isPassword = false, String hint = ""}) {
     return Container(
@@ -61,14 +39,48 @@ class _AddFeedState extends State<AddFeed> {
     );
   }
 
+  File _image;
+  final picker = ImagePicker();
+
+  Future chooseFile() async {
+    File image = await ImagePicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 50);
+
+    setState(() {
+      _image = image;
+    });
+  }
+
+  Future uploadImageToFirebase(BuildContext context) async {
+    final feed = Provider.of<FeedProvider>(context, listen: false);
+    String fileName = basename(_image.path);
+    Reference firebaseStorageRef =
+        FirebaseStorage.instance.ref().child('uploads/$fileName');
+    UploadTask uploadTask = firebaseStorageRef.putFile(_image);
+    TaskSnapshot taskSnapshot = await uploadTask;
+
+    taskSnapshot.ref.getDownloadURL().then((value) => {
+          feed.changeimgUrl(value),
+
+          // delProvider.changeButtonDisable(false),
+          // Navigator.of(context).pop(),
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     final height = MediaQuery.of(context).size.height;
+
     final feedProvider = Provider.of<FeedProvider>(context, listen: true);
 
     Widget _submitButton() {
       return InkWell(
-        onTap: () => feedProvider.saveToDbFeed(),
+        onTap: () async {
+          await uploadImageToFirebase(context)
+              .then((value) => feedProvider.saveToDbFeed())
+              .then((value) => Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Home())));
+        },
         child: Container(
           width: MediaQuery.of(context).size.width,
           padding: EdgeInsets.symmetric(vertical: 15),
@@ -174,12 +186,6 @@ class _AddFeedState extends State<AddFeed> {
   }
 
   Widget getImageAsset(height) {
-    AssetImage assImg = AssetImage('images/qr.png');
-    Image img = Image(
-      image: assImg,
-      width: 150.0,
-      height: 150.0,
-    );
     return Container(
       alignment: Alignment.topCenter,
       margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
@@ -192,20 +198,13 @@ class _AddFeedState extends State<AddFeed> {
             ),
           ),
 
-          // _image == null
-          //     ? RaisedButton(
-          //         child: Text('Choose File'),
-          //         onPressed: chooseFile,
-          //         color: Colors.cyan,
-          //       )
-          //     : Container(),
           Container(
             margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
             child: SizedBox(
               height: height * 0.3,
               child: Center(
                 child: ElevatedButton(
-                    onPressed: () => chooseFile(), child: Text('Press me')),
+                    onPressed: () => chooseFile(), child: Text('Upload')),
               ),
             ),
           ),
