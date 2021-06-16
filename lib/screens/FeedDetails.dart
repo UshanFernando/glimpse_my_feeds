@@ -2,16 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:provider/provider.dart';
-import 'package:webfeed/domain/rss_feed.dart';
 import 'package:webfeed/domain/rss_item.dart';
-import 'package:intl/intl.dart';
 
 class FeedDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var feedItem = ModalRoute.of(context).settings.arguments as RssItem;
-    double width = MediaQuery.of(context).size.width;
-    double height = MediaQuery.of(context).size.height;
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => Scaffold(
               backgroundColor: theme.getTheme.backgroundColor,

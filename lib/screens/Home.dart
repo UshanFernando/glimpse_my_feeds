@@ -141,60 +141,63 @@ class Home extends StatelessWidget {
                 ),
                 Expanded(
                   // height: height - 110,
-                  child: GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 1.17, crossAxisCount: 2),
-                    padding: EdgeInsets.zero,
-                    itemBuilder: (_, index) => Column(children: [
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ViewFeed(),
-                              settings: RouteSettings(
-                                arguments: feeds[index],
+                  child: feeds.length != 0
+                      ? GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                  childAspectRatio: 1.17, crossAxisCount: 2),
+                          padding: EdgeInsets.zero,
+                          itemBuilder: (_, index) => Column(children: [
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewFeed(),
+                                    settings: RouteSettings(
+                                      arguments: feeds[index],
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                height: 174,
+                                child: Card(
+                                  color: theme.getTheme.secondaryHeaderColor,
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  elevation: 8,
+                                  child: Column(
+                                    children: [
+                                      SizedBox(
+                                        height: 110,
+                                        width: width * 0.45,
+                                        child: Image.network(
+                                          feeds[index].imgUrl,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 16,
+                                      ),
+                                      Text(
+                                        feeds[index].title,
+                                        style: TextStyle(
+                                            color: theme.getTheme.textTheme
+                                                .bodyText1.color),
+                                      ),
+                                    ],
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  margin: EdgeInsets.all(10),
+                                ),
                               ),
                             ),
-                          );
-                        },
-                        child: Container(
-                          height: 174,
-                          child: Card(
-                            color: theme.getTheme.secondaryHeaderColor,
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            elevation: 8,
-                            child: Column(
-                              children: [
-                                SizedBox(
-                                  height: 110,
-                                  width: width * 0.45,
-                                  child: Image.network(
-                                    feeds[index].imgUrl,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 16,
-                                ),
-                                Text(
-                                  feeds[index].title,
-                                  style: TextStyle(
-                                      color: theme
-                                          .getTheme.textTheme.bodyText1.color),
-                                ),
-                              ],
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10.0),
-                            ),
-                            margin: EdgeInsets.all(10),
-                          ),
-                        ),
-                      ),
-                    ]),
-                    itemCount: feeds.length,
-                  ),
+                          ]),
+                          itemCount: feeds.length,
+                        )
+                      : Center(child: Text("No Feeds to Display")),
                 ),
               ],
             )));

@@ -23,6 +23,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   String user = await RegistrationProvider().getUserEmail();
+  print('main $user');
   runApp(new MyApp(user));
 }
 

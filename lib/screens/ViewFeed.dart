@@ -1,19 +1,16 @@
-import 'dart:io';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/AddFeed.dart';
 import 'package:glimpse_my_feeds/screens/FeedDetails.dart';
-import 'package:glimpse_my_feeds/screens/Home.dart';
+
 import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:glimpse_my_feeds/service/Feeds.dart';
-import 'package:http/io_client.dart';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
-import 'package:http/http.dart';
 
 class ViewFeed extends StatelessWidget {
   const ViewFeed() : super();
