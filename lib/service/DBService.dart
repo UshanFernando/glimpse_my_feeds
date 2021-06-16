@@ -19,12 +19,15 @@ class DBService {
     return _db.collection('users').doc(user.email).set(user.toMap());
   }
 
-  Stream<User> loginUser(User user) {
-    // return _db
-    //     .collection('users')
-    //     .where("email", isEqualTo: user.email)
-    //     .snapshots()
-    //     .getDocument();
+  Future<User> loginUser(User user) async {
+    DocumentSnapshot variable =
+        await _db.collection('users').doc(user.email).get();
+
+    if (variable != null) {
+      return User.fromFirestore(variable.data());
+    } else {
+      return null;
+    }
   }
 
   Stream<List<FeedItem>> getFeeds() {

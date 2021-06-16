@@ -15,8 +15,7 @@ class User {
     return {'username': username, 'email': email, 'password': password};
   }
 
-  User.fromFirestore(Map<String, dynamic> firestore, String id) {
-    this.id = id;
+  User.fromFirestore(Map<String, dynamic> firestore) {
     username = firestore['userame'] ?? 'N/A';
     email = firestore['email'] ?? 'N/A';
     password = firestore['password'] ?? 'N/A';

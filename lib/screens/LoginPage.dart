@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
+import 'package:glimpse_my_feeds/screens/Home.dart';
 import 'package:glimpse_my_feeds/screens/bezierContainer.dart';
 import 'package:glimpse_my_feeds/screens/SignUp.dart';
 import 'package:provider/provider.dart';
@@ -172,8 +173,15 @@ class _LoginPageState extends State<LoginPage> {
 
     Widget _submitButton() {
       return InkWell(
-        onTap: () {
-          registrationProvider.login();
+        onTap: () async {
+          await registrationProvider.login().then((ele) => {
+                print(ele),
+                if (ele)
+                  {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Home()))
+                  }
+              });
         },
         child: Container(
           width: MediaQuery.of(context).size.width,
