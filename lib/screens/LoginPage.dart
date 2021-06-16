@@ -178,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
                 print(ele),
                 if (ele)
                   {
-                    Navigator.push(context,
+                    Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => Home()))
                   }
               });

@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/AddFeed.dart';
+import 'package:glimpse_my_feeds/screens/LoginPage.dart';
+import 'package:glimpse_my_feeds/screens/SignUp.dart';
 import 'package:glimpse_my_feeds/screens/ViewFeed.dart';
 import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +18,25 @@ class Home extends StatelessWidget {
   final databaseReference = FirebaseFirestore.instance;
   @override
   Widget build(BuildContext context) {
+    final registrationProvider =
+        Provider.of<RegistrationProvider>(context, listen: true);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (registrationProvider.isLogged == null ||
+          !registrationProvider.isLogged) {
+        @override
+        void run() {
+          scheduleMicrotask(() {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+          });
+        }
+
+        run();
+      }
+    });
     var feeds = Provider.of<List<FeedItem>>(context);
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -38,9 +62,11 @@ class Home extends StatelessWidget {
             backgroundColor: theme.getTheme.backgroundColor,
             appBar: AppBar(
               elevation: 0,
+              leading: null,
               backgroundColor: theme.getTheme.backgroundColor,
               title: Text(
                 'Hello Ushan!',
+                textAlign: TextAlign.start,
                 style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
