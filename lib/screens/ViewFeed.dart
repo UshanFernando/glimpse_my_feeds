@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
+import 'package:glimpse_my_feeds/screens/AddFeed.dart';
 import 'package:glimpse_my_feeds/screens/FeedDetails.dart';
 import 'package:glimpse_my_feeds/screens/Home.dart';
 import 'package:glimpse_my_feeds/service/DBService.dart';
@@ -39,15 +40,23 @@ class ViewFeed extends StatelessWidget {
                     IconButton(
                       icon: new Icon(Icons.edit),
                       tooltip: 'Edit',
-                      onPressed: () => {},
+                      onPressed: () => {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddFeed(),
+                            settings: RouteSettings(
+                              arguments: feedItem,
+                            ),
+                          ),
+                        )
+                      },
                     ),
                     new IconButton(
                       icon: new Icon(Icons.delete),
                       tooltip: 'Delete',
                       onPressed: () {
-                        DBService()
-                            .deleteFeed(feedItem.id)
-                            .then((value) => Navigator.pop(context));
+                        showAlertDialog(context, theme.getTheme, feedItem);
                       },
                     ),
                   ],
@@ -175,6 +184,48 @@ class ViewFeed extends StatelessWidget {
     );
   }
 
+  showAlertDialog(BuildContext context, ThemeData theme, FeedItem feedItem) {
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel"),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Yes"),
+      onPressed: () {
+        DBService()
+            .deleteFeed(feedItem.id)
+            .then((value) => Navigator.pop(context));
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      backgroundColor: theme.secondaryHeaderColor,
+      title: Text(
+        "Delete Feed?",
+        style: TextStyle(fontSize: 18, color: theme.textTheme.bodyText1.color),
+      ),
+      content: Text(
+        "Are you Sure You want to delete this Feed?",
+        style: TextStyle(fontSize: 18, color: theme.textTheme.bodyText1.color),
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
 //   rssRetrieve()  {
 
 //   }

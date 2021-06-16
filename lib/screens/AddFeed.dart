@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 
 class AddFeed extends StatefulWidget {
   @override
@@ -33,7 +37,7 @@ class _AddFeedState extends State<AddFeed> {
 //    });
 //  }
 
-  Widget _entryField(String title,
+  Widget _entryField(String title, ThemeData theme, String text,
       {bool isPassword = false, String hint = ""}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -42,7 +46,10 @@ class _AddFeedState extends State<AddFeed> {
         children: <Widget>[
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: theme.textTheme.bodyText1.color),
           ),
           SizedBox(
             height: 10,
@@ -52,14 +59,15 @@ class _AddFeedState extends State<AddFeed> {
               decoration: InputDecoration(
                   hintText: hint,
                   border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
+                  fillColor: theme.secondaryHeaderColor,
+                  hintStyle: TextStyle(color: theme.textTheme.bodyText2.color),
                   filled: true))
         ],
       ),
     );
   }
 
-  Widget _submitButton() {
+  Widget _submitButton(ThemeData theme) {
     return Container(
       width: MediaQuery.of(context).size.width,
       padding: EdgeInsets.symmetric(vertical: 15),
@@ -68,7 +76,7 @@ class _AddFeedState extends State<AddFeed> {
           borderRadius: BorderRadius.all(Radius.circular(5)),
           boxShadow: <BoxShadow>[
             BoxShadow(
-                color: Colors.grey.shade200,
+                color: theme.dividerColor,
                 offset: Offset(2, 4),
                 blurRadius: 5,
                 spreadRadius: 2)
@@ -86,42 +94,52 @@ class _AddFeedState extends State<AddFeed> {
 
   @override
   Widget build(BuildContext context) {
+    var feedItem = ModalRoute.of(context).settings.arguments as FeedItem;
     final height = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Your Favorite Feed'),
-      ),
-      body: Container(
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return Consumer<ThemeNotifier>(
+        builder: (context, theme, _) => Scaffold(
+              backgroundColor: theme.getTheme.backgroundColor,
+              appBar: AppBar(
+                title: Text(
+                  feedItem == null ? 'Add Your Favorite Feed' : 'Update Feed',
+                ),
+                backgroundColor: theme.getTheme.accentColor,
+              ),
+              body: Container(
+                child: ListView(
                   children: <Widget>[
-                    SizedBox(height: height * .005),
-                    _entryField("Name",
-                        isPassword: false, hint: "Enter your Feed's Name"),
-                    SizedBox(height: height * .005),
-                    _entryField("URL",
-                        isPassword: false, hint: "Enter your RSS Feed's URL"),
-                    SizedBox(height: height * .005),
-                    getImageAsset(height),
-                    _submitButton(),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(height: height * .005),
+                            _entryField("Name", theme.getTheme,
+                                feedItem != null ? feedItem.title : '',
+                                isPassword: false,
+                                hint: "Enter your Feed's Name"),
+                            SizedBox(height: height * .005),
+                            _entryField("URL", theme.getTheme,
+                                feedItem != null ? feedItem.url : '',
+                                isPassword: false,
+                                hint: "Enter your RSS Feed's URL"),
+                            SizedBox(height: height * .005),
+                            getImageAsset(height, theme.getTheme),
+                            _submitButton(theme.getTheme),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
+            ));
   }
 
-  Widget getImageAsset(height) {
+  Widget getImageAsset(height, ThemeData theme) {
     AssetImage assImg = AssetImage('images/qr.png');
     Image img = Image(
       image: assImg,
@@ -136,7 +154,10 @@ class _AddFeedState extends State<AddFeed> {
           Container(
             child: Text(
               'Selected Image',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: theme.textTheme.bodyText1.color),
             ),
           ),
 
@@ -153,7 +174,11 @@ class _AddFeedState extends State<AddFeed> {
               height: height * 0.3,
               child: Center(
                 child: ElevatedButton(
-                    onPressed: () => chooseFile(), child: Text('Press me')),
+                    style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(theme.accentColor)),
+                    onPressed: () => chooseFile(),
+                    child: Text('Press me')),
               ),
             ),
           ),

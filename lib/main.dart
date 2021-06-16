@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
               create: (_) => new ThemeNotifier())
         ],
         child: MaterialApp(
-           debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: false,
             title: 'Glimpse My Feeds',
             theme: ThemeData(
               // This is the theme of your application.
@@ -62,7 +62,7 @@ class MyApp extends StatelessWidget {
               // closer together (more dense) than on mobile platforms.
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: LoginPage()
+            home: Home()
             // MyHomePage(title: 'Flutter Demo Home Page'),
             ));
   }

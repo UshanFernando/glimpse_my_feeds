@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
+import 'package:glimpse_my_feeds/screens/AddFeed.dart';
 import 'package:glimpse_my_feeds/screens/ViewFeed.dart';
 import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:provider/provider.dart';
@@ -50,7 +51,14 @@ class Home extends StatelessWidget {
                   icon: new Icon(Icons.add,
                       color: theme.getTheme.textTheme.bodyText1.color),
                   tooltip: 'Add New',
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddFeed(),
+                      ),
+                    );
+                  },
                 ),
                 PopupMenuButton<String>(
                   color: theme.getTheme.backgroundColor,
