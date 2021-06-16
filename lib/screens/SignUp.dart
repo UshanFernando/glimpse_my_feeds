@@ -16,7 +16,8 @@ class _SignUpState extends State<SignUp> {
   Widget _backButton() {
     return InkWell(
       onTap: () {
-        Navigator.pop(context);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoginPage()));
       },
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10),
@@ -67,34 +68,17 @@ class _SignUpState extends State<SignUp> {
     );
   }
 
-  Widget _title() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(text: 'd',
-          // style: GoogleFonts.portLligatSans(
-          //   textStyle: Theme.of(context).textTheme.display1,
-          //   fontSize: 30,
-          //   fontWeight: FontWeight.w700,
-          //   color: Color(0xffe46b10),
-          // ),
-          children: [
-            TextSpan(
-              text: 'ev',
-              style: TextStyle(color: Colors.black, fontSize: 30),
-            ),
-            TextSpan(
-              text: 'rnz',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
-            ),
-          ]),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final registrationProvider =
         Provider.of<RegistrationProvider>(context, listen: false);
     final height = MediaQuery.of(context).size.height;
+    Widget _title() {
+      return SizedBox(
+        child: Image.asset('images/logo.png'),
+        height: height * 0.090,
+      );
+    }
 
     Widget _submitButton() {
       return InkWell(
@@ -265,7 +249,7 @@ class _SignUpState extends State<SignUp> {
                           //       style: TextStyle(
                           //           fontSize: 14, fontWeight: FontWeight.w500)),
                           // ),
-                          SizedBox(height: height * .110),
+                          SizedBox(height: height * .090),
                           _createAccountLabel(),
                         ],
                       ),

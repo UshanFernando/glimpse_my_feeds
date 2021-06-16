@@ -10,7 +10,7 @@ class FeedProvider with ChangeNotifier {
 
   String _title;
   String _url;
-  // String _password;
+  String _imgUrl;
   // bool _isLogged;
   // List<FeedItem> _feedItems = [];
 
@@ -18,6 +18,7 @@ class FeedProvider with ChangeNotifier {
   // String get username => _username;
   String get title => _title;
   String get url => _url;
+  String get imgUrl => _imgUrl;
 
   changeTitle(String value) {
     _title = value;
@@ -25,6 +26,10 @@ class FeedProvider with ChangeNotifier {
 
   changeUrl(String value) {
     _url = value;
+  }
+
+  changeimgUrl(String value) async {
+    _imgUrl = value;
   }
 
   // changePassword(String value) {
@@ -36,7 +41,15 @@ class FeedProvider with ChangeNotifier {
   // }
 
   saveToDbFeed() {
-    StorageManager.readData('user').then((value) =>
-        {firestoreService.saveFeed(FeedItem(title: _title, url: _url), value)});
+    StorageManager.readData('user')
+        .then((value) => {
+              firestoreService.saveFeed(
+                  FeedItem(title: _title, url: _url, imgUrl: _imgUrl), value)
+            })
+        .then((value) => {
+              _title = null,
+              _url = null,
+              _imgUrl = null,
+            });
   }
 }
