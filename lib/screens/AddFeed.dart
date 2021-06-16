@@ -181,98 +181,81 @@ class _AddFeedState extends State<AddFeed> {
 
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => Scaffold(
-              backgroundColor: theme.getTheme.backgroundColor,
-              appBar: AppBar(
-                title: Text(
-                  feedItem == null ? 'Add Your Favorite Feed' : 'Update Feed',
-                ),
-                backgroundColor: theme.getTheme.accentColor,
+            backgroundColor: theme.getTheme.backgroundColor,
+            appBar: AppBar(
+              title: Text(
+                feedItem == null ? 'Add Your Favorite Feed' : 'Update Feed',
               ),
-              body: Container(
-                child: ListView(
-                  children: <Widget>[
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            SizedBox(height: height * .005),
-                            _entryField("Name", theme.getTheme,
-                                feedItem != null ? feedItem.title : '',
-                                isPassword: false,
-                                hint: "Enter your Feed's Name"),
-                            SizedBox(height: height * .005),
-                            _entryField("URL", theme.getTheme,
-                                feedItem != null ? feedItem.url : '',
-                                isPassword: false,
-                                hint: "Enter your RSS Feed's URL"),
-                            SizedBox(height: height * .005),
-                            getImageAsset(height, theme.getTheme),
-                            _submitButton(theme.getTheme),
-                          ],
+              backgroundColor: theme.getTheme.accentColor,
+            ),
+            body: Container(
+              child: ListView(children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "Name",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              TextField(
+                                  onChanged: (value) =>
+                                      feedProvider.changeTitle(value),
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                      hintText: "Enter your Feed's Name",
+                                      border: InputBorder.none,
+                                      fillColor: Color(0xfff3f3f4),
+                                      filled: true))
+                            ],
+                          ),
                         ),
-                      ),
+                        SizedBox(height: height * .005),
+                        Container(
+                          margin: EdgeInsets.symmetric(vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                "URL",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 15),
+                              ),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              TextField(
+                                  onChanged: (value) =>
+                                      feedProvider.changeUrl(value),
+                                  obscureText: false,
+                                  decoration: InputDecoration(
+                                      hintText: "Enter your RSS Feed's URL",
+                                      border: InputBorder.none,
+                                      fillColor: Color(0xfff3f3f4),
+                                      filled: true))
+                            ],
+                          ),
+                        ),
+                        SizedBox(height: height * .005),
+                        getImageAsset(height, theme.getTheme),
+                        _submitButton(theme.getTheme),
+                      ],
                     ),
-                    SizedBox(height: height * .005),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "Name",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextField(
-                              onChanged: (value) =>
-                                  feedProvider.changeTitle(value),
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                  hintText: "Enter your Feed's Name",
-                                  border: InputBorder.none,
-                                  fillColor: Color(0xfff3f3f4),
-                                  filled: true))
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: height * .005),
-                    Container(
-                      margin: EdgeInsets.symmetric(vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            "URL",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 15),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          TextField(
-                              onChanged: (value) =>
-                                  feedProvider.changeUrl(value),
-                              obscureText: false,
-                              decoration: InputDecoration(
-                                  hintText: "Enter your RSS Feed's URL",
-                                  border: InputBorder.none,
-                                  fillColor: Color(0xfff3f3f4),
-                                  filled: true))
-                        ],
-                      ),
-                    ),
-                    SizedBox(height: height * .005),
-                    getImageAsset(height, theme.getTheme),
-                    _submitButton(theme.getTheme),
-                  ],
+                  ),
                 ),
-              ),
-            ));
+              ]),
+            )));
   }
 }
