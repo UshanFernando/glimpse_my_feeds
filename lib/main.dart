@@ -38,6 +38,7 @@ class MyApp extends StatelessWidget {
               create: (_) => new ThemeNotifier())
         ],
         child: MaterialApp(
+           debugShowCheckedModeBanner: false,
             title: 'Glimpse My Feeds',
             theme: ThemeData(
               // This is the theme of your application.

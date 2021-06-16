@@ -25,6 +25,7 @@ class ViewFeed extends StatelessWidget {
     double height = MediaQuery.of(context).size.height;
     return Consumer<ThemeNotifier>(
       builder: (context, theme, _) => Scaffold(
+        backgroundColor: theme.getTheme.backgroundColor,
         body: NestedScrollView(
           headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
             return <Widget>[
@@ -53,9 +54,7 @@ class ViewFeed extends StatelessWidget {
                   leading: IconButton(
                     icon: new Icon(Icons.arrow_back),
                     tooltip: 'Go Back',
-                    onPressed: () => {
-                      Navigator.pop(context)
-                    },
+                    onPressed: () => {Navigator.pop(context)},
                   ),
                   // title: Text("Coporate News"),
                   elevation: 8,
@@ -86,21 +85,14 @@ class ViewFeed extends StatelessWidget {
                           margin: new EdgeInsets.symmetric(
                               horizontal: 10.0, vertical: 6.0),
                           child: ListTile(
+                              tileColor: theme.getTheme.secondaryHeaderColor,
                               contentPadding: EdgeInsets.symmetric(
                                   horizontal: 20.0, vertical: 10.0),
-                              // leading: Container(
-                              //   padding: EdgeInsets.only(right: 12.0),
-                              //   decoration: new BoxDecoration(
-                              //       border: new Border(
-                              //           right: new BorderSide(
-                              //               width: 1.0, color: Colors.white24))),
-                              //   child:
-                              //       Icon(Icons.autorenew, color: Colors.black87),
-                              // ),
                               title: Text(
                                 snapshot.data.items[index].title,
                                 style: TextStyle(
-                                    color: Colors.black,
+                                    color: theme
+                                        .getTheme.textTheme.bodyText1.color,
                                     fontWeight: FontWeight.bold),
                               ),
                               // subtitle: Text("Intermediate", style: TextStyle(color: Colors.white)),
@@ -114,13 +106,18 @@ class ViewFeed extends StatelessWidget {
                                         children: <Widget>[
                                           Icon(Icons.access_time,
                                               size: 17,
-                                              color: Colors.blueAccent),
+                                              color: theme.getTheme
+                                                  .accentIconTheme.color),
                                           Text(
                                               DateFormat(' yyyy-MM-dd – kk:mm')
                                                   .format(snapshot.data
                                                       .items[index].pubDate),
                                               style: TextStyle(
-                                                  color: Colors.black87))
+                                                  color: theme
+                                                      .getTheme
+                                                      .textTheme
+                                                      .bodyText2
+                                                      .color))
                                         ],
                                       ),
                                     )
