@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/model/User.dart';
+import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 
 class DBService {
   final _db = FirebaseFirestore.instance;
@@ -30,11 +31,11 @@ class DBService {
     }
   }
 
-  Stream<List<FeedItem>> getFeeds() {
-    print('get feeds called');
+  Stream<List<FeedItem>> getFeeds(String email) {
+    RegistrationProvider provider = RegistrationProvider();
     return _db
         .collection('users')
-        .doc('ushn@gmail.com')
+        .doc(email)
         .collection('feeds')
         .snapshots()
         .map((snapshot) => snapshot.docs
@@ -43,10 +44,10 @@ class DBService {
             .toList());
   }
 
-  Future<void> deleteFeed(String feedId) {
+  Future<void> deleteFeed(String feedId, String user) {
     return _db
         .collection('users')
-        .doc('ushn@gmail.com')
+        .doc(user)
         .collection('feeds')
         .doc(feedId)
         .delete();

@@ -48,6 +48,26 @@ class RegistrationProvider with ChangeNotifier {
     _feedItems = [];
   }
 
+  Future<bool> getLoggedStatus() async {
+    var value = await StorageManager.readData('email');
+
+    print('value read from storage: ' + value.toString());
+    var email = value ?? null;
+    if (email != null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Future<String> getUserName() async {
+    return await StorageManager.readData('name');
+  }
+
+  Future<String> getUserEmail() async {
+    return await StorageManager.readData('user');
+  }
+
   login() async {
     User user = await firestoreService.loginUser(
         User(username: _username, email: _email, password: _password));
@@ -57,12 +77,18 @@ class RegistrationProvider with ChangeNotifier {
       changeIsLogged(true);
       print("true");
       StorageManager.saveData('user', user.email);
+      StorageManager.saveData('name', user.username);
       return true;
       // print()
     } else {
       changeIsLogged(false);
       return false;
     }
+  }
+
+  logout() {
+    StorageManager.deleteData('user');
+    StorageManager.deleteData('name');
   }
 
   addFeedsToDb() {

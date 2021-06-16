@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/model/User.dart';
 import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/AddFeed.dart';
@@ -22,20 +24,15 @@ class Home extends StatelessWidget {
         Provider.of<RegistrationProvider>(context, listen: true);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (registrationProvider.isLogged == null ||
-          !registrationProvider.isLogged) {
-        @override
-        void run() {
-          scheduleMicrotask(() {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => LoginPage()),
-            );
+      registrationProvider.getUserName().then((value) => {
+            if (value == null)
+              {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                )
+              }
           });
-        }
-
-        run();
-      }
     });
     var feeds = Provider.of<List<FeedItem>>(context);
     double width = MediaQuery.of(context).size.width;
@@ -46,9 +43,16 @@ class Home extends StatelessWidget {
     // dbservice.saveFeed(new FeedItem(
     //     title: "Neth NEWS", url: 'HRR[AFKSALA', imgUrl: 'DFSFSDFSFDS'));
 
-    void handleClick(String value, ThemeNotifier theme) {
+    void handleClick(
+        String value, ThemeNotifier theme, RegistrationProvider pr) {
       switch (value) {
         case 'Logout':
+          pr.logout();
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => LoginPage()),
+          );
+
           break;
         case 'Toggle Theme':
           theme.toggleTheme();
@@ -64,14 +68,29 @@ class Home extends StatelessWidget {
               elevation: 0,
               leading: null,
               backgroundColor: theme.getTheme.backgroundColor,
-              title: Text(
-                'Hello Ushan!',
-                textAlign: TextAlign.start,
-                style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: theme.getTheme.textTheme.bodyText1.color),
-              ),
+              title: FutureBuilder<String>(
+                  future: registrationProvider.getUserName(),
+                  builder: (context, snapshot) {
+                    if (snapshot.data == null) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
+                        if (snapshot.data != null) {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginPage()),
+                          );
+                        }
+                      });
+                    }
+                    return Text(
+                      'Hello ${snapshot != null ? snapshot.data : ''}!',
+                      textAlign: TextAlign.start,
+                      style: TextStyle(
+                          fontSize: 26,
+                          fontWeight: FontWeight.bold,
+                          color: theme.getTheme.textTheme.bodyText1.color),
+                    );
+                  }),
               actions: [
                 new IconButton(
                   icon: new Icon(Icons.add,
@@ -90,7 +109,8 @@ class Home extends StatelessWidget {
                   color: theme.getTheme.backgroundColor,
                   icon: Icon(Icons.more_vert,
                       color: theme.getTheme.textTheme.bodyText1.color),
-                  onSelected: (value) => {handleClick(value, theme)},
+                  onSelected: (value) =>
+                      {handleClick(value, theme, registrationProvider)},
                   itemBuilder: (BuildContext context) {
                     return {'Toggle Theme', 'Logout'}.map((String choice) {
                       return PopupMenuItem<String>(

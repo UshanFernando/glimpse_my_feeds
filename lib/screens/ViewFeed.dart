@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/AddFeed.dart';
 import 'package:glimpse_my_feeds/screens/FeedDetails.dart';
@@ -20,6 +21,8 @@ class ViewFeed extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var feedItem = ModalRoute.of(context).settings.arguments as FeedItem;
+    final registrationProvider =
+        Provider.of<RegistrationProvider>(context, listen: true);
     // print(feeds);
     // print(feed);
     double width = MediaQuery.of(context).size.width;
@@ -56,7 +59,8 @@ class ViewFeed extends StatelessWidget {
                       icon: new Icon(Icons.delete),
                       tooltip: 'Delete',
                       onPressed: () {
-                        showAlertDialog(context, theme.getTheme, feedItem);
+                        showAlertDialog(context, theme.getTheme, feedItem,
+                            registrationProvider);
                       },
                     ),
                   ],
@@ -184,7 +188,8 @@ class ViewFeed extends StatelessWidget {
     );
   }
 
-  showAlertDialog(BuildContext context, ThemeData theme, FeedItem feedItem) {
+  showAlertDialog(BuildContext context, ThemeData theme, FeedItem feedItem,
+      RegistrationProvider provider) {
     // set up the buttons
     Widget cancelButton = TextButton(
       child: Text("Cancel"),
@@ -192,12 +197,17 @@ class ViewFeed extends StatelessWidget {
         Navigator.of(context).pop();
       },
     );
-    Widget continueButton = TextButton(
-      child: Text("Yes"),
-      onPressed: () {
-        DBService()
-            .deleteFeed(feedItem.id)
-            .then((value) => Navigator.pop(context));
+    Widget continueButton = FutureBuilder<String>(
+      future: provider.getUserEmail(),
+      builder: (context, snapshot) {
+        return TextButton(
+            child: Text("Yes"),
+            onPressed: () {
+              DBService()
+                  .deleteFeed(feedItem.id, snapshot.data)
+                  .then((value) => Navigator.pop(context));
+              Navigator.pop(context);
+            });
       },
     );
 
