@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/providers/FeedProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -96,6 +97,35 @@ class _AddFeedState extends State<AddFeed> {
   Widget build(BuildContext context) {
     var feedItem = ModalRoute.of(context).settings.arguments as FeedItem;
     final height = MediaQuery.of(context).size.height;
+    final feedProvider = Provider.of<FeedProvider>(context, listen: true);
+
+    Widget _submitButton(ThemeData theme) {
+      return InkWell(
+        onTap: () => feedProvider.saveToDbFeed(),
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                    color: Colors.grey.shade200,
+                    offset: Offset(2, 4),
+                    blurRadius: 5,
+                    spreadRadius: 2)
+              ],
+              gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+          child: Text(
+            'Save',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+      );
+    }
 
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => Scaffold(
@@ -133,6 +163,61 @@ class _AddFeedState extends State<AddFeed> {
                         ),
                       ),
                     ),
+                    SizedBox(height: height * .005),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "Name",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          TextField(
+                              onChanged: (value) =>
+                                  feedProvider.changeTitle(value),
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                  hintText: "Enter your Feed's Name",
+                                  border: InputBorder.none,
+                                  fillColor: Color(0xfff3f3f4),
+                                  filled: true))
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: height * .005),
+                    Container(
+                      margin: EdgeInsets.symmetric(vertical: 10),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            "URL",
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 15),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          TextField(
+                              onChanged: (value) =>
+                                  feedProvider.changeUrl(value),
+                              obscureText: false,
+                              decoration: InputDecoration(
+                                  hintText: "Enter your RSS Feed's URL",
+                                  border: InputBorder.none,
+                                  fillColor: Color(0xfff3f3f4),
+                                  filled: true))
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: height * .005),
+                    getImageAsset(height,theme.getTheme),
+                    _submitButton(theme.getTheme),
                   ],
                 ),
               ),

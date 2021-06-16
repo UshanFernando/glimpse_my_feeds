@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
+import 'package:glimpse_my_feeds/providers/FeedProvider.dart';
 import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:glimpse_my_feeds/screens/Home.dart';
@@ -34,6 +35,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
         providers: [
           // ChangeNotifierProvider(create: (context) => RequisitionProvider()),
+          ChangeNotifierProvider<FeedProvider>(
+              create: (_) => new FeedProvider()),
           ChangeNotifierProvider<RegistrationProvider>(
               create: (_) => new RegistrationProvider()),
           StreamProvider(
