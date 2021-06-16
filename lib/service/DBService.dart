@@ -20,11 +20,11 @@ class DBService {
   }
 
   Stream<User> loginUser(User user) {
-    return _db
-        .collection('users')
-        .doc(user.email)
-        .snapshots()
-        .map((document) => User.fromFirestore(document.data(), document.id));
+    // return _db
+    //     .collection('users')
+    //     .where("email", isEqualTo: user.email)
+    //     .snapshots()
+    //     .getDocument();
   }
 
   Stream<List<FeedItem>> getFeeds() {

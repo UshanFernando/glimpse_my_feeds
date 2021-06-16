@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-// import 'customClipper.dart';
+import 'customClipper.dart';
 
 class BezierContainer extends StatelessWidget {
   const BezierContainer({Key key}) : super(key: key);
@@ -11,9 +11,9 @@ class BezierContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         child: Transform.rotate(
-      angle: -pi / 3.5,
+      angle: -pi / 3.0,
       child: ClipPath(
-        // clipper: ClipPainter(),
+        clipper: ClipPainter(),
         child: Container(
           height: MediaQuery.of(context).size.height * .5,
           width: MediaQuery.of(context).size.width,
