@@ -28,7 +28,7 @@ class FeedProvider with ChangeNotifier {
     _url = value;
   }
 
-  changeimgUrl(String value) {
+  changeimgUrl(String value) async {
     _imgUrl = value;
   }
 
@@ -41,9 +41,15 @@ class FeedProvider with ChangeNotifier {
   // }
 
   saveToDbFeed() {
-    StorageManager.readData('user').then((value) => {
-          firestoreService.saveFeed(
-              FeedItem(title: _title, url: _url, imgUrl: _imgUrl), value)
-        });
+    StorageManager.readData('user')
+        .then((value) => {
+              firestoreService.saveFeed(
+                  FeedItem(title: _title, url: _url, imgUrl: _imgUrl), value)
+            })
+        .then((value) => {
+              _title = null,
+              _url = null,
+              _imgUrl = null,
+            });
   }
 }

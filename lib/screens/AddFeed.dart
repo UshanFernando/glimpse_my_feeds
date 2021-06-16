@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/FeedProvider.dart';
+import 'package:glimpse_my_feeds/providers/RegistrationProvider.dart';
 import 'package:glimpse_my_feeds/screens/Home.dart';
 import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
+import 'package:glimpse_my_feeds/service/DBService.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart';
@@ -16,36 +18,6 @@ class AddFeed extends StatefulWidget {
 }
 
 class _AddFeedState extends State<AddFeed> {
-  Widget _entryField(String title, ThemeData theme, String text,
-      {bool isPassword = false, String hint = ""}) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            title,
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: theme.textTheme.bodyText1.color),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextField(
-              obscureText: isPassword,
-              decoration: InputDecoration(
-                  hintText: hint,
-                  border: InputBorder.none,
-                  fillColor: theme.secondaryHeaderColor,
-                  hintStyle: TextStyle(color: theme.textTheme.bodyText2.color),
-                  filled: true))
-        ],
-      ),
-    );
-  }
-
   File _image;
   final picker = ImagePicker();
 
@@ -56,22 +28,6 @@ class _AddFeedState extends State<AddFeed> {
     setState(() {
       _image = image;
     });
-  }
-
-  Future uploadImageToFirebase(BuildContext context) async {
-    final feed = Provider.of<FeedProvider>(context, listen: false);
-    String fileName = basename(_image.path);
-    Reference firebaseStorageRef =
-        FirebaseStorage.instance.ref().child('uploads/$fileName');
-    UploadTask uploadTask = firebaseStorageRef.putFile(_image);
-    TaskSnapshot taskSnapshot = await uploadTask;
-
-    taskSnapshot.ref.getDownloadURL().then((value) => {
-          feed.changeimgUrl(value),
-
-          // delProvider.changeButtonDisable(false),
-          // Navigator.of(context).pop(),
-        });
   }
 
   Widget getImageAsset(height, ThemeData theme) {
@@ -139,17 +95,39 @@ class _AddFeedState extends State<AddFeed> {
     );
   }
 
+  var nameText = TextEditingController();
+  var urlText = TextEditingController();
+  bool first = true;
   @override
   Widget build(BuildContext context) {
     var feedItem = ModalRoute.of(context).settings.arguments as FeedItem;
     final height = MediaQuery.of(context).size.height;
 
     final feedProvider = Provider.of<FeedProvider>(context, listen: true);
+    final registrationProvider =
+        Provider.of<RegistrationProvider>(context, listen: true);
+    if (feedItem != null && first) {
+      nameText.text = feedItem.title;
+      urlText.text = feedItem.url;
+      first = false;
+    }
+
+    Future uploadImageToFirebase() async {
+      String fileName = basename(_image.path);
+      Reference firebaseStorageRef =
+          FirebaseStorage.instance.ref().child('uploads/$fileName');
+      UploadTask uploadTask = firebaseStorageRef.putFile(_image);
+      TaskSnapshot taskSnapshot = await uploadTask;
+
+      taskSnapshot.ref.getDownloadURL().then((value) async {
+        await feedProvider.changeimgUrl(value);
+      });
+    }
 
     Widget _submitButton(ThemeData theme) {
       return InkWell(
         onTap: () async {
-          await uploadImageToFirebase(context)
+          await uploadImageToFirebase()
               .then((value) => feedProvider.saveToDbFeed())
               .then((value) => Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Home())));
@@ -162,7 +140,7 @@ class _AddFeedState extends State<AddFeed> {
               borderRadius: BorderRadius.all(Radius.circular(5)),
               boxShadow: <BoxShadow>[
                 BoxShadow(
-                    color: Colors.grey.shade200,
+                    color: theme.dividerColor,
                     offset: Offset(2, 4),
                     blurRadius: 5,
                     spreadRadius: 2)
@@ -179,6 +157,41 @@ class _AddFeedState extends State<AddFeed> {
       );
     }
 
+    Widget _updateButton(ThemeData theme, FeedItem feed, String email) {
+      return InkWell(
+        onTap: () async {
+          feed.title = nameText.text;
+          feed.url = urlText.text;
+          print(feed);
+          DBService().updateFeed(feed, email);
+          // .then((value) => Navigator.push(
+          //     context, MaterialPageRoute(builder: (context) => Home())));
+        },
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          padding: EdgeInsets.symmetric(vertical: 15),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              boxShadow: <BoxShadow>[
+                BoxShadow(
+                    color: theme.dividerColor,
+                    offset: Offset(2, 4),
+                    blurRadius: 5,
+                    spreadRadius: 2)
+              ],
+              gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [Color(0xfffbb448), Color(0xfff7892b)])),
+          child: Text(
+            'Update',
+            style: TextStyle(fontSize: 20, color: Colors.white),
+          ),
+        ),
+      );
+    }
+
     return Consumer<ThemeNotifier>(
         builder: (context, theme, _) => Scaffold(
             backgroundColor: theme.getTheme.backgroundColor,
@@ -188,74 +201,90 @@ class _AddFeedState extends State<AddFeed> {
               ),
               backgroundColor: theme.getTheme.accentColor,
             ),
-            body: Container(
-              child: ListView(children: <Widget>[
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 20),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 10),
+            body: FutureBuilder<String>(
+                future: registrationProvider.getUserEmail(),
+                builder: (context, snapshot) {
+                  return Container(
+                    child: ListView(children: <Widget>[
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: SingleChildScrollView(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text(
-                                "Name",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      "Name",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: theme.getTheme.textTheme
+                                              .bodyText1.color),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    TextField(
+                                        onChanged: (value) =>
+                                            nameText.text = value,
+                                        obscureText: false,
+                                        controller: nameText,
+                                        decoration: InputDecoration(
+                                            hintText: "Enter your Feed's Name",
+                                            border: InputBorder.none,
+                                            fillColor: Color(0xfff3f3f4),
+                                            filled: true))
+                                  ],
+                                ),
                               ),
-                              SizedBox(
-                                height: 10,
+                              SizedBox(height: height * .005),
+                              Container(
+                                margin: EdgeInsets.symmetric(vertical: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      "URL",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 15,
+                                          color: theme.getTheme.textTheme
+                                              .bodyText1.color),
+                                    ),
+                                    SizedBox(
+                                      height: 10,
+                                    ),
+                                    TextField(
+                                        controller: urlText,
+                                        onChanged: (value) =>
+                                            urlText.text = value,
+                                        obscureText: false,
+                                        decoration: InputDecoration(
+                                            hintText:
+                                                "Enter your RSS Feed's URL",
+                                            border: InputBorder.none,
+                                            fillColor: Color(0xfff3f3f4),
+                                            filled: true))
+                                  ],
+                                ),
                               ),
-                              TextField(
-                                  onChanged: (value) =>
-                                      feedProvider.changeTitle(value),
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                      hintText: "Enter your Feed's Name",
-                                      border: InputBorder.none,
-                                      fillColor: Color(0xfff3f3f4),
-                                      filled: true))
+                              SizedBox(height: height * .005),
+                              getImageAsset(height, theme.getTheme),
+                              feedItem == null
+                                  ? _submitButton(theme.getTheme)
+                                  : _updateButton(
+                                      theme.getTheme, feedItem, snapshot.data),
                             ],
                           ),
                         ),
-                        SizedBox(height: height * .005),
-                        Container(
-                          margin: EdgeInsets.symmetric(vertical: 10),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Text(
-                                "URL",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 15),
-                              ),
-                              SizedBox(
-                                height: 10,
-                              ),
-                              TextField(
-                                  onChanged: (value) =>
-                                      feedProvider.changeUrl(value),
-                                  obscureText: false,
-                                  decoration: InputDecoration(
-                                      hintText: "Enter your RSS Feed's URL",
-                                      border: InputBorder.none,
-                                      fillColor: Color(0xfff3f3f4),
-                                      filled: true))
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: height * .005),
-                        getImageAsset(height, theme.getTheme),
-                        _submitButton(theme.getTheme),
-                      ],
-                    ),
-                  ),
-                ),
-              ]),
-            )));
+                      ),
+                    ]),
+                  );
+                })));
   }
 }

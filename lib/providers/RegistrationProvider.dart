@@ -74,14 +74,12 @@ class RegistrationProvider with ChangeNotifier {
 
     print("regobj $user");
     if (user != null) {
-      changeIsLogged(true);
       print("true");
       StorageManager.saveData('user', user.email);
       StorageManager.saveData('name', user.username);
       return true;
       // print()
     } else {
-      changeIsLogged(false);
       return false;
     }
   }

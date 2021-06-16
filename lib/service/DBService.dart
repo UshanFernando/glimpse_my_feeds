@@ -15,14 +15,35 @@ class DBService {
         .set(feed.toMap());
   }
 
+  Future<void> updateFeed(FeedItem feed, email) {
+    print(feed.title);
+    return _db
+        .collection('users')
+        .doc(email)
+        .collection('feeds')
+        .doc(feed.id)
+        .update({'title': '${feed.title}', 'url': '${feed.url}'}).catchError(
+            (error) => print('Update failed: $error ${feed.id}'));
+    ;
+  }
+
   Future<void> register(User user) {
     print(user.email);
     return _db.collection('users').doc(user.email).set(user.toMap());
   }
 
   Future<User> loginUser(User user) async {
-    DocumentSnapshot variable =
-        await _db.collection('users').doc(user.email).get();
+    DocumentSnapshot variable;
+    await _db.collection('users').doc(user.email).get().then((value) => {
+          if (value.exists)
+            {
+              variable = value,
+            }
+          else
+            {
+              variable = null,
+            }
+        });
 
     if (variable != null) {
       return User.fromFirestore(variable.data());

@@ -11,27 +11,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  Widget _backButton() {
-    return InkWell(
-      onTap: () {
-        Navigator.pop(context);
-      },
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10),
-        child: Row(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.only(left: 0, top: 10, bottom: 10),
-              child: Icon(Icons.keyboard_arrow_left, color: Colors.black),
-            ),
-            Text('Back',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500))
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _entryField(String title, {bool isPassword = false}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -89,26 +68,44 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _title() {
-    return RichText(
-      textAlign: TextAlign.center,
-      text: TextSpan(text: 'd',
-          // style: GoogleFonts.portLligatSans(
-          //   textStyle: Theme.of(context).textTheme.display1,
-          //   fontSize: 30,
-          //   fontWeight: FontWeight.w700,
-          //   color: Color(0xffe46b10),
-          // ),
-          children: [
-            TextSpan(
-              text: 'ev',
-              style: TextStyle(color: Colors.black, fontSize: 30),
+  Future<void> _showMyDialog(
+      context, type, isDisable, isRedirect, message) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Center(
+            child: Icon(
+              type == "success" ? Icons.done_rounded : Icons.error,
+              color: Colors.black45,
+              size: 40,
             ),
-            TextSpan(
-              text: 'rnz',
-              style: TextStyle(color: Color(0xffe46b10), fontSize: 30),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Center(child: Text(message)),
+              ],
             ),
-          ]),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(isDisable ? "Please wait..." : "Ok"),
+              onPressed: () {
+                if (isRedirect) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => LoginPage()),
+                  );
+                } else {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -117,6 +114,12 @@ class _LoginPageState extends State<LoginPage> {
     final height = MediaQuery.of(context).size.height;
     final registrationProvider =
         Provider.of<RegistrationProvider>(context, listen: true);
+    Widget _title() {
+      return SizedBox(
+        child: Image.asset('images/logo.png'),
+        height: height * 0.095,
+      );
+    }
 
     Widget _emailPasswordWidget() {
       return Column(
@@ -181,6 +184,11 @@ class _LoginPageState extends State<LoginPage> {
                     Navigator.pushReplacement(context,
                         MaterialPageRoute(builder: (context) => Home()))
                   }
+                else
+                  {
+                    _showMyDialog(context, "error", false, false,
+                        "Wrong Username or Password!")
+                  }
               });
         },
         child: Container(
@@ -237,13 +245,12 @@ class _LoginPageState extends State<LoginPage> {
                         style: TextStyle(
                             fontSize: 14, fontWeight: FontWeight.w500)),
                   ),
-                  SizedBox(height: height * .200),
+                  SizedBox(height: height * .150),
                   _createAccountLabel(),
                 ],
               ),
             ),
           ),
-          Positioned(top: 40, left: 0, child: _backButton()),
         ],
       ),
     ));

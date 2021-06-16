@@ -143,7 +143,7 @@ class Home extends StatelessWidget {
                   // height: height - 110,
                   child: GridView.builder(
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        childAspectRatio: 1.17, crossAxisCount: 2),
+                        childAspectRatio: 1.10, crossAxisCount: 2),
                     padding: EdgeInsets.zero,
                     itemBuilder: (_, index) => Column(children: [
                       InkWell(
@@ -159,7 +159,7 @@ class Home extends StatelessWidget {
                           );
                         },
                         child: Container(
-                          height: 174,
+                          height: 164,
                           child: Card(
                             color: theme.getTheme.secondaryHeaderColor,
                             clipBehavior: Clip.antiAliasWithSaveLayer,
