@@ -1,7 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:glimpse_my_feeds/model/FeedItem.dart';
 import 'package:glimpse_my_feeds/providers/FeedProvider.dart';
 import 'package:glimpse_my_feeds/screens/Home.dart';
+import 'package:glimpse_my_feeds/providers/ThemeProvider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:path/path.dart';
@@ -13,7 +16,7 @@ class AddFeed extends StatefulWidget {
 }
 
 class _AddFeedState extends State<AddFeed> {
-  Widget _entryField(String title,
+  Widget _entryField(String title, ThemeData theme, String text,
       {bool isPassword = false, String hint = ""}) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -22,7 +25,10 @@ class _AddFeedState extends State<AddFeed> {
         children: <Widget>[
           Text(
             title,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: theme.textTheme.bodyText1.color),
           ),
           SizedBox(
             height: 10,
@@ -32,7 +38,8 @@ class _AddFeedState extends State<AddFeed> {
               decoration: InputDecoration(
                   hintText: hint,
                   border: InputBorder.none,
-                  fillColor: Color(0xfff3f3f4),
+                  fillColor: theme.secondaryHeaderColor,
+                  hintStyle: TextStyle(color: theme.textTheme.bodyText2.color),
                   filled: true))
         ],
       ),
@@ -67,13 +74,79 @@ class _AddFeedState extends State<AddFeed> {
         });
   }
 
+  Widget getImageAsset(height, ThemeData theme) {
+    return Container(
+      alignment: Alignment.topCenter,
+      margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
+      child: Stack(
+        children: <Widget>[
+          Container(
+            child: Text(
+              'Selected Image',
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15,
+                  color: theme.textTheme.bodyText1.color),
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
+            child: SizedBox(
+              height: height * 0.3,
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: () => chooseFile(),
+                  child: Text('Upload'),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.all(theme.accentColor)),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: height * .005),
+          Container(
+            margin: EdgeInsets.only(top: 35.0, bottom: 5.0),
+            child: Stack(children: <Widget>[
+              Flexible(
+                  child: _image != null
+                      ? Image.file(
+                          _image,
+                          height: height * 0.3,
+                        )
+                      : Text("")),
+              _image != null
+                  ? Positioned(
+                      bottom: 15,
+                      right: 0,
+                      child: RawMaterialButton(
+                        onPressed: () => chooseFile(),
+                        elevation: 2.0,
+                        fillColor: Colors.white,
+                        child: Icon(
+                          Icons.edit,
+                          size: 25.0,
+                        ),
+                        padding: EdgeInsets.all(10.0),
+                        shape: CircleBorder(),
+                      ),
+                    )
+                  : Container(height: 150),
+            ]),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    var feedItem = ModalRoute.of(context).settings.arguments as FeedItem;
     final height = MediaQuery.of(context).size.height;
 
     final feedProvider = Provider.of<FeedProvider>(context, listen: true);
 
-    Widget _submitButton() {
+    Widget _submitButton(ThemeData theme) {
       return InkWell(
         onTap: () async {
           await uploadImageToFirebase(context)
@@ -106,20 +179,42 @@ class _AddFeedState extends State<AddFeed> {
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Your Favorite Feed'),
-      ),
-      body: Container(
-        child: ListView(
-          children: <Widget>[
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return Consumer<ThemeNotifier>(
+        builder: (context, theme, _) => Scaffold(
+              backgroundColor: theme.getTheme.backgroundColor,
+              appBar: AppBar(
+                title: Text(
+                  feedItem == null ? 'Add Your Favorite Feed' : 'Update Feed',
+                ),
+                backgroundColor: theme.getTheme.accentColor,
+              ),
+              body: Container(
+                child: ListView(
                   children: <Widget>[
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(height: height * .005),
+                            _entryField("Name", theme.getTheme,
+                                feedItem != null ? feedItem.title : '',
+                                isPassword: false,
+                                hint: "Enter your Feed's Name"),
+                            SizedBox(height: height * .005),
+                            _entryField("URL", theme.getTheme,
+                                feedItem != null ? feedItem.url : '',
+                                isPassword: false,
+                                hint: "Enter your RSS Feed's URL"),
+                            SizedBox(height: height * .005),
+                            getImageAsset(height, theme.getTheme),
+                            _submitButton(theme.getTheme),
+                          ],
+                        ),
+                      ),
+                    ),
                     SizedBox(height: height * .005),
                     Container(
                       margin: EdgeInsets.symmetric(vertical: 10),
@@ -173,97 +268,11 @@ class _AddFeedState extends State<AddFeed> {
                       ),
                     ),
                     SizedBox(height: height * .005),
-                    getImageAsset(height),
-                    _submitButton(),
+                    getImageAsset(height, theme.getTheme),
+                    _submitButton(theme.getTheme),
                   ],
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget getImageAsset(height) {
-    return Container(
-      alignment: Alignment.topCenter,
-      margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
-      child: Stack(
-        children: <Widget>[
-          Container(
-            child: Text(
-              'Selected Image',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-            ),
-          ),
-
-          Container(
-            margin: EdgeInsets.only(top: 15.0, bottom: 5.0),
-            child: SizedBox(
-              height: height * 0.3,
-              child: Center(
-                child: ElevatedButton(
-                    onPressed: () => chooseFile(), child: Text('Upload')),
-              ),
-            ),
-          ),
-          SizedBox(height: height * .005),
-          Container(
-            margin: EdgeInsets.only(top: 35.0, bottom: 5.0),
-            child: Stack(children: <Widget>[
-              Flexible(
-                  child: _image != null
-                      ? Image.file(
-                          _image,
-                          height: height * 0.3,
-                        )
-                      : Text("")),
-              _image != null
-                  ? Positioned(
-                      bottom: 15,
-                      right: 0,
-                      child: RawMaterialButton(
-                        onPressed: () => chooseFile(),
-                        elevation: 2.0,
-                        fillColor: Colors.white,
-                        child: Icon(
-                          Icons.edit,
-                          size: 25.0,
-                        ),
-                        padding: EdgeInsets.all(10.0),
-                        shape: CircleBorder(),
-                      ),
-                    )
-                  : Container(height: 150),
-            ]),
-          ),
-
-          // _image != null
-          //     ? RaisedButton(
-          //         child: Text('Upload File'),
-          //         onPressed: uploadFile,
-          //         color: Colors.cyan,
-          //       )
-          //     : Container(),
-          // _image != null
-          //     ? RaisedButton(
-          //         child: Text('Clear Selection'),
-          //         onPressed: clearSelection,
-          //       )
-          //     : Container(),
-          // Text('Uploaded Image'),
-          // _uploadedFileURL != null
-          //     ? Image.network(
-          //         _uploadedFileURL,
-          //         height: 150,
-          //       )
-          //     : Container(),
-          // SizedBox(
-          //   child: img,
-          // ),
-        ],
-      ),
-    );
+            ));
   }
 }

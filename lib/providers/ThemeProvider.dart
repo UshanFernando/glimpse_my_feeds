@@ -2,30 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:glimpse_my_feeds/service/StorageController.dart';
 
 class ThemeNotifier with ChangeNotifier {
+  bool _darkMod = false;
   final darkTheme = ThemeData(
       primarySwatch: Colors.grey,
       primaryColor: Colors.grey,
+      secondaryHeaderColor: const Color.fromARGB(255, 84, 93, 110),
       brightness: Brightness.dark,
-      backgroundColor: const Color(0xFF212121),
-      accentColor: Colors.white,
-      accentIconTheme: IconThemeData(color: Colors.black),
+      backgroundColor: const Color.fromARGB(255, 59, 66, 84),
+      accentColor: const Color.fromARGB(255, 123, 31, 162),
+      accentIconTheme: IconThemeData(color: Color.fromARGB(255, 219, 255, 98)),
       dividerColor: Colors.black12,
       textTheme: TextTheme(
-          title: TextStyle(color: Colors.white),
-          subtitle: TextStyle(color: Colors.white70)));
+          bodyText1: TextStyle(color: Colors.white),
+          bodyText2: TextStyle(color: Colors.white70)));
 
   final lightTheme = ThemeData(
       primarySwatch: Colors.grey,
       primaryColor: Colors.white,
       brightness: Brightness.light,
-      backgroundColor: Colors.white70,
+      backgroundColor: const Color.fromARGB(255, 250, 250, 250),
       accentColor: Colors.indigoAccent,
-      accentIconTheme: IconThemeData(color: Colors.white),
-      dividerColor: Color.fromARGB(1, 250, 250, 250),
+      secondaryHeaderColor: Colors.white,
+      accentIconTheme: IconThemeData(color: Color.fromARGB(255, 255, 23, 68)),
+      dividerColor: const Color.fromARGB(1, 250, 250, 250),
       textTheme: TextTheme(
           bodyText1: TextStyle(color: Colors.black),
           bodyText2: TextStyle(color: Colors.black87)));
-  bool _darkMod;
 
   ThemeData _themeData;
   ThemeData get getTheme => _themeData == null ? lightTheme : _themeData;
@@ -36,23 +38,35 @@ class ThemeNotifier with ChangeNotifier {
       var themeMode = value ?? 'light';
       if (themeMode == 'light') {
         _themeData = lightTheme;
+        _darkMod = false;
       } else {
         print('setting dark theme');
         _themeData = darkTheme;
+        _darkMod = true;
       }
       notifyListeners();
     });
   }
 
+  void toggleTheme() async {
+    if (_darkMod) {
+      setLightMode();
+    } else {
+      setDarkMode();
+    }
+  }
+
   void setDarkMode() async {
     _themeData = darkTheme;
     StorageManager.saveData('themeMode', 'dark');
+    _darkMod = true;
     notifyListeners();
   }
 
   void setLightMode() async {
     _themeData = lightTheme;
     StorageManager.saveData('themeMode', 'light');
+    _darkMod = false;
     notifyListeners();
   }
 }

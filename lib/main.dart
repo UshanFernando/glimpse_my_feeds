@@ -17,19 +17,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webfeed/webfeed.dart';
 
+import 'model/User.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  runApp(new MyApp());
+  String user = await RegistrationProvider().getUserEmail();
+  runApp(new MyApp(user));
 }
 
 class MyApp extends StatelessWidget {
+  final String user;
+  MyApp(this.user);
   // This widget is the root of your application.
   DBService dbService = DBService();
   List<FeedItem> initData = [
     new FeedItem(title: 'Neth', url: 'salndsoalnd'),
     new FeedItem(title: 'Hiru', url: 'salndsoalnd'),
   ];
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -40,13 +46,14 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProvider<RegistrationProvider>(
               create: (_) => new RegistrationProvider()),
           StreamProvider(
-            create: (context) => dbService.getFeeds(),
+            create: (context) => dbService.getFeeds(user),
             initialData: initData,
           ),
           ChangeNotifierProvider<ThemeNotifier>(
               create: (_) => new ThemeNotifier())
         ],
         child: MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Glimpse My Feeds',
             theme: ThemeData(
               // This is the theme of your application.
@@ -64,7 +71,7 @@ class MyApp extends StatelessWidget {
               // closer together (more dense) than on mobile platforms.
               visualDensity: VisualDensity.adaptivePlatformDensity,
             ),
-            home: AddFeed()
+            home: Home()
             // MyHomePage(title: 'Flutter Demo Home Page'),
             ));
   }
