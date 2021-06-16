@@ -97,6 +97,8 @@ class _AddFeedState extends State<AddFeed> {
 
   var nameText = TextEditingController();
   var urlText = TextEditingController();
+  String title = '';
+  String url = '';
   bool first = true;
   @override
   Widget build(BuildContext context) {
@@ -129,7 +131,7 @@ class _AddFeedState extends State<AddFeed> {
         onTap: () async {
           await uploadImageToFirebase()
               .then((value) => feedProvider.saveToDbFeed())
-              .then((value) => Navigator.push(
+              .then((value) => Navigator.pushReplacement(
                   context, MaterialPageRoute(builder: (context) => Home())));
         },
         child: Container(
@@ -160,12 +162,12 @@ class _AddFeedState extends State<AddFeed> {
     Widget _updateButton(ThemeData theme, FeedItem feed, String email) {
       return InkWell(
         onTap: () async {
-          feed.title = nameText.text;
-          feed.url = urlText.text;
+          feed.title = title;
+          feed.url = url;
           print(feed);
-          DBService().updateFeed(feed, email);
-          // .then((value) => Navigator.push(
-          //     context, MaterialPageRoute(builder: (context) => Home())));
+          DBService().updateFeed(feed, email).then((value) =>
+              Navigator.pushReplacement(
+                  context, MaterialPageRoute(builder: (context) => Home())));
         },
         child: Container(
           width: MediaQuery.of(context).size.width,
@@ -230,8 +232,10 @@ class _AddFeedState extends State<AddFeed> {
                                       height: 10,
                                     ),
                                     TextField(
-                                        onChanged: (value) =>
-                                            nameText.text = value,
+                                        onChanged: (value) => {
+                                              title = value,
+                                              feedProvider.changeTitle(value)
+                                            },
                                         obscureText: false,
                                         controller: nameText,
                                         decoration: InputDecoration(
@@ -261,8 +265,10 @@ class _AddFeedState extends State<AddFeed> {
                                     ),
                                     TextField(
                                         controller: urlText,
-                                        onChanged: (value) =>
-                                            urlText.text = value,
+                                        onChanged: (value) => {
+                                              url = value,
+                                              feedProvider.changeUrl(value),
+                                            },
                                         obscureText: false,
                                         decoration: InputDecoration(
                                             hintText:
